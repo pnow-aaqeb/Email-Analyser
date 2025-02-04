@@ -52,7 +52,7 @@ export class EmbeddingController {
 
   @Post('insert')
   async insertMessage() {
-    Promise.resolve()
+    await Promise.resolve()
       .then(async () => {
         const result = await this.insertMessages.insertEmails();
         this.logger.log('inserting messages', result);

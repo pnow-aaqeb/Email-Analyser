@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import * as cheerio from 'cheerio';
-import { Prisma } from 'prisma/generated/client-primary';
+import { Prisma } from 'client';
 enum Department {
   RESEARCH = 'RESEARCH',
   RECRUITMENT = 'RECRUITMENT',

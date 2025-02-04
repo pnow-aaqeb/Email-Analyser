@@ -50,7 +50,6 @@
 //   private validationGraph;
 //   private GraphAnnotation;
 
-
 //   constructor(
 //     // private prisma: PrismaService,
 //     private configService: ConfigService,
@@ -73,7 +72,7 @@
 //       ...MessagesAnnotation.spec,
 //       classification: Annotation<z.infer<typeof classificationSchema>>(),
 //       validatedClassifications: Annotation<ClassificationResponse>(),
-//       // context: Annotation<string>(), 
+//       // context: Annotation<string>(),
 //     });
 //     this.initializeClassificationChain();
 //     this.setUpValidationGraph();
@@ -88,7 +87,7 @@
 
 //     const promptTemplate = ChatPromptTemplate.fromTemplate(`
 //      ${prompt}
-      
+
 //       For each instance you identify, you must include meaningful metadata:
 //       - For Clients: Include industry, location if mentioned
 //       - For Contacts: Include role/title, company affiliation if mentioned
@@ -99,9 +98,9 @@
 
 //       Email to classify:
 //       {emailContent}
-      
+
 //       Ensure each instance includes relevant metadata extracted from the email content.
-      
+
 //       {format_instructions}
 //     `);
 
@@ -116,12 +115,12 @@
 //           similarEmailsContext: any;
 //         }) => JSON.stringify(input.similarEmailsContext, null, 2),
 //         categories: () => `
-//           - Clients 
-//           - Contacts 
-//           - Candidates 
+//           - Clients
+//           - Contacts
+//           - Candidates
 //           - Positions
-//           - Location 
-//           - Point of Contacts 
+//           - Location
+//           - Point of Contacts
 //         `,
 //         format_instructions: () => outputParser.getFormatInstructions(),
 //       },
@@ -140,23 +139,23 @@
 //     const callModel = async (state: typeof this.GraphAnnotation.State) => {
 //       const messages = state.messages;
 //       const context = state.context;
-  
+
 //       // Combine system message, context, and user messages
 //       const allMessages = [
 //        VALIDATOR_PROMPT,
 //         // new SystemMessage(context), // Add stored context
 //         ...messages
 //       ];
-  
+
 //       const response = await model.invoke(allMessages);
-  
+
 //       if (response.tool_calls?.length) {
 //         return {
 //           messages: [response],
 //           // context: state.context, // Preserve context
 //         };
 //       }
-  
+
 //       const toolMessages = messages.filter((msg) => msg.type === 'tool');
 //       const validatedClassifications = {
 //         classifications: toolMessages.map((msg) => {
@@ -164,7 +163,7 @@
 //           return toolResponse.classifications[0];
 //         }),
 //       };
-  
+
 //       return {
 //         messages: [response],
 //         validatedClassifications,
@@ -249,8 +248,8 @@
 
 //       //   // Update embeddings
 //       //   await prisma.$executeRaw`
-//       //     UPDATE "Email" 
-//       //     SET 
+//       //     UPDATE "Email"
+//       //     SET
 //       //       "subjectEmbedding" = ${JSON.stringify(embeddings.subject)}::vector,
 //       //       "bodyEmbedding" = ${JSON.stringify(embeddings.body)}::vector,
 //       //       "senderEmbedding" = ${JSON.stringify(embeddings.sender)}::vector,
@@ -297,7 +296,7 @@
 
 //   //     const hybridSearchQuery = Prisma.sql`
 //   //       WITH similarity_scores AS (
-//   //         SELECT 
+//   //         SELECT
 //   //           id,
 //   //           (
 //   //             COALESCE(("subjectEmbedding" <=> ${JSON.stringify(embeddings.subject)}::vector) * 0.3, 0) +
@@ -317,7 +316,7 @@
 //   //           AND "senderEmbedding" IS NOT NULL
 //   //           AND "receiverEmbedding" IS NOT NULL
 //   //       )
-//   //       SELECT 
+//   //       SELECT
 //   //         e.id,
 //   //         e.subject,
 //   //         e.body,
@@ -445,7 +444,7 @@
 // //                 for (const instance of classification.instances) {
 // //                     if (instance.confidence < 0.95) continue;
 
-// //                     const finalConfidence = instance.confidence * 0.7 + 
+// //                     const finalConfidence = instance.confidence * 0.7 +
 // //                         (instance.similarityScore || 0) * 0.3;
 
 // //                     console.log("this is the final confidence",finalConfidence)
@@ -494,14 +493,14 @@
 // //                           },
 // //                       },
 // //                   });
-                  
+
 // //                   this.logger.log('Checking for existing EmailEntity:', {
 // //                       emailId,
 // //                       entityId: entity.id,
 // //                       entityInstanceId: entityInstance.id,
 // //                       exists: !!existingEmailEntity
 // //                   });
-                  
+
 // //                   if (existingEmailEntity) {
 // //                       this.logger.log('EmailEntity already exists:', {
 // //                           id: existingEmailEntity.id,
@@ -511,7 +510,7 @@
 // //                       });
 // //                       continue;
 // //                   }
-                  
+
 // //                   try {
 // //                       this.logger.log('Attempting to create EmailEntity with data:', {
 // //                           emailId,
@@ -519,7 +518,7 @@
 // //                           entityInstanceId: entityInstance.id,
 // //                           confidence: finalConfidence
 // //                       });
-                  
+
 // //                       const emailEntity = await prisma.emailEntity.create({
 // //                           data: {
 // //                               emailId,
@@ -528,7 +527,7 @@
 // //                               confidence: finalConfidence,
 // //                           },
 // //                       });
-                      
+
 // //                       this.logger.log('Successfully created EmailEntity:', {
 // //                           id: emailEntity.id,
 // //                           emailId: emailEntity.emailId,
@@ -549,7 +548,7 @@
 // //                               entityInstanceId: entityInstance.id,
 // //                           }
 // //                       });
-                      
+
 // //                       if (error.code === 'P2002') {
 // //                           this.logger.warn('Duplicate EmailEntity detected:', {
 // //                               emailId,

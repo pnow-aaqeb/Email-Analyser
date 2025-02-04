@@ -2,7 +2,7 @@
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ConversationTopic, Prisma } from 'prisma/generated/client-primary';
+import { ConversationTopic, Prisma } from 'prisma';
 import { PrismaService } from 'src/prisma.service';
 import { IMessage } from './categorization.service';
 import * as cheerio from 'cheerio';

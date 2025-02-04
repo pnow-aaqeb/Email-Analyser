@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bull';
 import * as cheerio from 'cheerio';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaServicePrimary } from './prisma.service';
 import { IEmailParticipants, Department, IMessage } from 'src/types';
 // import { Prisma } from '@pnats/db-prisma/dist/prisma/sql/tenants/client';
 import {
@@ -13,7 +13,7 @@ import {
   recruiters,
   researchers,
 } from '../email-categorization/users';
-import { Prisma } from 'prisma/generated/client-primary';
+// import { Prisma } from 'prisma/generated/client-primary';
 
 @Injectable()
 export class EmbeddingAndCategorizationService {
@@ -24,16 +24,16 @@ export class EmbeddingAndCategorizationService {
   private readonly openaiEmbeddings: OpenAIEmbeddings;
   private readonly schema: string;
   private readonly tenantId: string;
-  private prisma: PrismaService;
+  private prisma: PrismaServicePrimary;
 
   constructor(
     @InjectQueue('email-processing') private readonly emailQueue: Queue,
-    private readonly prismaService: PrismaService,
+    private readonly prismaService: PrismaServicePrimary,
     private readonly configService: ConfigService,
   ) {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY');
     // TODO: schema/tenant id to be uploaded dynamically
-    this.schema = '019403ee-2961-7f8e-9682-c2c5dede384b';
+    this.schema = 'embeddings';
     this.tenantId = this.schema;
 
     this.openaiEmbeddings = new OpenAIEmbeddings({
@@ -93,34 +93,39 @@ export class EmbeddingAndCategorizationService {
    */
   public processMessage = async (message: IMessage): Promise<string> => {
     try {
+      this.logger.log(`Starting to process message ${message.id}`);
       const emailData = {
         sender_email: message.sender_email,
         recipients: this.parseJsonEmails(message.recipients),
         cc_recipients: this.parseJsonEmails(message.cc_recipients),
         bcc_recipients: this.parseJsonEmails(message.bcc_recipients),
       };
+      this.logger.log(`Parsed email data: ${JSON.stringify(emailData)}`);
 
       const departments = this.determineCategories(emailData);
-      const existingMetaData = this.parseMetadata(message.meta_data);
+      this.logger.log(`Determined departments: ${departments}`);
 
-      // First store department categorization
+      const existingMetaData = this.parseMetadata(message.meta_data);
+      this.logger.log(`Parsed metadata: ${JSON.stringify(existingMetaData)}`);
+
       await this.updateMessageMetadata(message.id, {
         ...existingMetaData,
         departments,
       });
+      this.logger.log(`Updated message metadata`);
 
-      // Then generate embeddings
+      this.logger.log(`Starting embedding generation`);
       await this.generateAndStoreEmbeddings(message);
+      this.logger.log(`Completed embedding generation`);
 
       return departments.length > 0
         ? `successfully categorized as ${departments.join(' and ')}`
         : 'categorization unsuccessful - no matching department found';
     } catch (error) {
-      this.logger.error(`Error in processMessage: ${error.message}`);
+      this.logger.error(`Error in processMessage: ${error.stack}`);
       throw error;
     }
   };
-
   /**
    * Parses metadata from string or object format
    * @param metaData - Message metadata in string or object format
@@ -165,7 +170,7 @@ export class EmbeddingAndCategorizationService {
     // const tenantClient = await this.prismaService.getClient(this.tenantId);
 
     try {
-      await this.prisma.primary.message.update({
+      await this.prismaService.primary.message.update({
         where: { id: messageId },
         data: { meta_data: metaData },
       });
@@ -300,7 +305,7 @@ export class EmbeddingAndCategorizationService {
    */
   private async generateAndStoreEmbeddings(message: IMessage): Promise<void> {
     const maxLength = 7000;
-    // await this.prisma.getClient(this.tenantId);
+    // await this.prismaService.primary.getClient(this.tenantId);
     const plainTextBody = this.htmlToText(message.body);
 
     try {
@@ -325,16 +330,16 @@ export class EmbeddingAndCategorizationService {
         ),
       ]);
 
-      const schemaName = Prisma.raw(`"${this.schema}"`);
-      await this.prisma.$executeRaw`
-        UPDATE ${schemaName}.messages 
-        SET 
-          subject_embedding = ${JSON.stringify(subjectEmbedding)}::${schemaName}.vector,
-          body_embedding = ${JSON.stringify(bodyEmbedding)}::${schemaName}.vector,
-          sender_embedding = ${JSON.stringify(senderEmbedding)}::${schemaName}.vector,
-          receiver_embedding = ${JSON.stringify(receiverEmbedding)}::${schemaName}.vector
-        WHERE id = ${message.id}::uuid
-      `;
+      // const schemaName = Prisma.raw(`"${this.schema}"`);
+      await this.prismaService.primary.$executeRaw`
+      UPDATE "embeddings"."messages"
+      SET 
+        subject_embedding = ${JSON.stringify(subjectEmbedding)}::"embeddings".vector,
+        body_embedding = ${JSON.stringify(bodyEmbedding)}::"embeddings".vector,
+        sender_embedding = ${JSON.stringify(senderEmbedding)}::"embeddings".vector,
+        receiver_embedding = ${JSON.stringify(receiverEmbedding)}::"embeddings".vector
+      WHERE id = ${message.id}::uuid
+    `;
     } catch (error) {
       this.logger.error(
         `Error generating or storing embeddings: ${error.message}`,

@@ -13,11 +13,7 @@ export class InsertMessages {
 
   insertEmails = async () => {
     try {
-      const messages = await this.prismaReadOnly.primary.message.findMany({
-        include: {
-          folders: true,
-        },
-      });
+      const messages = await this.prismaReadOnly.primary.message.findMany();
 
       this.logger.log(`Found ${messages.length} messages to insert`);
 

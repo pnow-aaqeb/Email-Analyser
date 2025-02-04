@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && cp -r prisma/generated dist/prisma/generated",
+    "build": "mkdir -p dist/prisma/generated && nest build && cp -r prisma/generated/client-primary dist/prisma/generated",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

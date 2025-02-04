@@ -67,83 +67,83 @@ export class CategorizationController {
   //     }
   // }
 
-  @Post('classify-all')
-  async classifyAllMessages() {
-    try {
-      let processedCount = 0;
-      let successCount = 0;
-      let failureCount = 0;
-      let skip = 0;
+  // @Post('classify-all')
+  // async classifyAllMessages() {
+  //   try {
+  //     let processedCount = 0;
+  //     let successCount = 0;
+  //     let failureCount = 0;
+  //     let skip = 0;
 
-      while (true) {
-        const messages = await this.prisma.primary.message.findMany({
-          where: {
-            MessageCompanyRelation: {
-              none: {},
-            },
-          },
-          take: this.BATCH_SIZE,
-          skip: skip,
-          // orderBy: {
-          //     created_at: 'a'
-          // },
-          select: {
-            id: true,
-            ms_message_id: true,
-            subject: true,
-            sender_name: true,
-            sender_email: true,
-            body: true,
-            recipients: true,
-            cc_recipients: true,
-            bcc_recipients: true,
-            meta_data: true,
-          },
-        });
+  //     while (true) {
+  //       const messages = await this.prisma.primary.message.findMany({
+  //         where: {
+  //           MessageCompanyRelation: {
+  //             none: {},
+  //           },
+  //         },
+  //         take: this.BATCH_SIZE,
+  //         skip: skip,
+  //         // orderBy: {
+  //         //     created_at: 'a'
+  //         // },
+  //         select: {
+  //           id: true,
+  //           ms_message_id: true,
+  //           subject: true,
+  //           sender_name: true,
+  //           sender_email: true,
+  //           body: true,
+  //           recipients: true,
+  //           cc_recipients: true,
+  //           bcc_recipients: true,
+  //           meta_data: true,
+  //         },
+  //       });
 
-        if (messages.length === 0) {
-          break;
-        }
+  //       if (messages.length === 0) {
+  //         break;
+  //       }
 
-        for (const message of messages) {
-          try {
-            const result =
-              await this.classificationService.processEmail(message);
-            if (result && result.length > 0) {
-              this.logger.log('result is', result);
-              successCount++;
-            } else {
-              failureCount++;
-            }
-          } catch (error) {
-            failureCount++;
-          }
-          processedCount++;
-        }
-        skip += this.BATCH_SIZE;
-      }
+  //       for (const message of messages) {
+  //         try {
+  //           const result =
+  //             await this.classificationService.processEmail(message);
+  //           if (result && result.length > 0) {
+  //             this.logger.log('result is', result);
+  //             successCount++;
+  //           } else {
+  //             failureCount++;
+  //           }
+  //         } catch (error) {
+  //           failureCount++;
+  //         }
+  //         processedCount++;
+  //       }
+  //       skip += this.BATCH_SIZE;
+  //     }
 
-      return {
-        success: true,
-        message: 'Classification complete',
-        stats: {
-          total: processedCount,
-          successful: successCount,
-          failed: failureCount,
-        },
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: `Classification failed: ${error.message}`,
-        stats: {
-          total: 0,
-          successful: 0,
-          failed: 0,
-        },
-      };
-    }
-  }
+  //     return {
+  //       success: true,
+  //       message: 'Classification complete',
+  //       stats: {
+  //         total: processedCount,
+  //         successful: successCount,
+  //         failed: failureCount,
+  //       },
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       success: false,
+  //       message: `Classification failed: ${error.message}`,
+  //       stats: {
+  //         total: 0,
+  //         successful: 0,
+  //         failed: 0,
+  //       },
+  //     };
+  //   }
+  // }
 
   @Get('fetch-vector')
   async fetchVectors() {

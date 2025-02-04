@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions", "prismaSchemaFolder", "fullTextSearchPostgres", "metrics"]
-  output          = "../generated/client"
+  // output          = "../generated/client"
 }
 
 generator dbml {
@@ -857,7 +857,7 @@ model Source {
 
 model Message {
   id                 String        @id @default(uuid()) @db.Uuid
-  ms_message_id      String        @unique @db.Uuid
+  ms_message_id      String        @unique 
   subject            String?       @db.Text
   sender_name        String?
   sender_email       String
