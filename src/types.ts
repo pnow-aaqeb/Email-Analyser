@@ -195,3 +195,47 @@ export interface IEmailRequest {
   bcc_recipients?: any;
   meta_data?: any;
 }
+export type EmailContent = {
+  body: string
+  subject: string
+  sender: string
+  recipients: string[]
+}
+
+export type AttachmentMetadata = {
+  file_type: string
+  file_name: string
+}
+
+export type Attachment = {
+  content: string
+  metadata: AttachmentMetadata
+}
+
+export type Classification = {
+  type: 'Resume' | 'Contract' | 'Job Description' | 'Invoice' | 'Other'
+  confidence: number
+  reasoning: string
+}
+
+export type ProcessedResume = {
+  name: string
+  skills: string[]
+  experience: string[]
+}
+
+export type ProcessedInvoice = {
+  vendor: string
+  amount: number
+  due_date: string
+}
+
+export type ProcessedContract = {
+  parties: string[]
+  expiration: string
+}
+
+export type ResultMetadata = {
+  processing_time: number
+  steps_executed: string[]
+}
